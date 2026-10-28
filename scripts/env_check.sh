@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # 环境自检：跑一次，看清缺什么、该装什么。
-# 用法: bash scripts/env_check.sh
+# 用法: bash scripts/env_check.sh   （在任何目录调用都可以，脚本会自己切到技能根目录）
 set -u
+
+# 初学者经常在别的目录里执行，先切到技能根目录，避免误报"找不到脚本"
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)" || exit 1
 
 ok()   { printf '  [OK]   %s\n' "$1"; }
 warn() { printf '  [WARN] %s\n' "$1"; }
