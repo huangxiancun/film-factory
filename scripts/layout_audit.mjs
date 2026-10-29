@@ -32,7 +32,15 @@ if (!file) { console.error('usage: layout_audit.mjs film/index.html [--step 0.1]
 const opt = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const STEP = parseFloat(opt('--step', '0.1'));
 const SHOTS = opt('--shots', null);
-const MIN_RUN = 0.3, SAFE = 48, W = 1920, H = 1080;
+const MIN_RUN = 0.3, SAFE = 48;
+// W/H 从作品的 data-width/data-height 声明读取——竖版 9:16 等非 1920x1080 的片
+// 之前被硬编码成横版尺寸，全画元素都被误判成 "partly off-frame"。
+let W = 1920, H = 1080;
+try {
+  const html0 = fs.readFileSync(path.resolve(file), 'utf8');
+  const mw = html0.match(/data-width="(\d+)"/), mh = html0.match(/data-height="(\d+)"/);
+  if (mw && mh) { W = parseInt(mw[1], 10); H = parseInt(mh[1], 10); }
+} catch {}
 
 function loadPuppeteer() {
   const tries = [process.cwd(), path.dirname(path.resolve(file)), path.dirname(new URL(import.meta.url).pathname)];
